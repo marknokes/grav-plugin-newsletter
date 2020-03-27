@@ -23,12 +23,14 @@ Before configuring this plugin, you should copy the `user/plugins/newsletter/new
 Here is the default configuration and an explanation of available options:
 
 ```yaml
-enabled: true             # Required
-log: ''                   # Defaults to '/logs/newsletter.log'
-data_dir: ''              # Defaults to '/user/data'
-sub_page_route: ''        # Defaults to '/newsletter'
-unsub_page_route: ''      # Defaults to '/newsletter-unsub'
-email_from: ''            # Defaults to email plugin default from
+enabled: true                    # Required
+log: null                        # Defaults to '/logs/newsletter.log'
+data_dir: null                   # Defaults to '/user/data'
+sub_page_route: null             # Defaults to '/newsletter'
+unsub_page_route: null           # Defaults to '/newsletter-unsub'
+email_from: null                 # Defaults to email plugin default from
+flush_email_queue_preview: true  # Defaults to true
+flush_email_queue_send: false    # Defaults to false
 ```
 
 Note that if you use the Admin Plugin, a file with your configuration named newsletter.yaml will be saved in the `user/config/plugins/`-folder once the configuration is saved in the Admin.
