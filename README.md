@@ -33,6 +33,8 @@ flush_email_queue_preview: true  # Defaults to true
 flush_email_queue_send: false    # Defaults to false
 ```
 
+![Screenshot of admin config screen](https://github.com/marknokes/grav-plugin-newsletter/blob/master/screenshot.png)
+
 Note that if you use the Admin Plugin, a file with your configuration named newsletter.yaml will be saved in the `user/config/plugins/`-folder once the configuration is saved in the Admin.
 
 ## Usage
