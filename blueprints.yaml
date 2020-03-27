@@ -9,7 +9,6 @@ homepage: https://github.com/marknokes/grav-plugin-newsletter
 demo: http://demo.yoursite.com
 keywords: grav, plugin, etc
 bugs: https://github.com/marknokes/grav-plugin-newsletter/issues
-docs: https://github.com/marknokes/grav-plugin-newsletter/blob/develop/README.md
 license: MIT
 
 dependencies:
