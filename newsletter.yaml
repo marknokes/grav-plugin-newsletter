@@ -1,0 +1,6 @@
+enabled: true
+log: ''                                   # Defaults to '/logs/newsletter.log'
+data_dir: ''                              # Defaults to '/user/data'
+sub_page_route: ''                        # Defaults to '/newsletter'
+unsub_page_route: ''                      # Defaults to '/newsletter-unsub'
+email_from: ''                            # Defaults to email plugin default from

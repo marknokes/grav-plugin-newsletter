@@ -1,0 +1,12 @@
+en:
+  PLUGIN_NEWSLETTER:
+    NEWSLETTER: Newsletter
+    UPDATE_LIST_HELP: The list will be updated automatically before any newsletters are sent, but not before an admin preview. You may update it manually with the button.
+    EMAIL_GREETING_LABEL: Greeting
+    DEFAULT_GREETING: Dear, {{ name }},
+    EMAIL_SUBJECT_LABEL: Subject
+    EMAIL_BODY_LABEL: Body
+    UPDATE_BTN_TXT: Update List
+    SEND_BTN_TXT: Email Subscribers
+    SEND_BTN_ADM_TXT: Admin Preview
+    MESSAGE_HELP: The Twig-style {{ name }} variable is only replaced in the greeting, which is prepended to the message body. You may change the greeting to anything you like.
