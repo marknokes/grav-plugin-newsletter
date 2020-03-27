@@ -23,14 +23,14 @@ Before configuring this plugin, you should copy the `user/plugins/newsletter/new
 Here is the default configuration and an explanation of available options:
 
 ```yaml
-enabled: true                    # Required
-log: null                        # Defaults to '/logs/newsletter.log'
-data_dir: null                   # Defaults to '/user/data'
-sub_page_route: null             # Defaults to '/newsletter'
-unsub_page_route: null           # Defaults to '/newsletter-unsub'
-email_from: null                 # Defaults to email plugin default from
-flush_email_queue_preview: true  # Defaults to true
-flush_email_queue_send: false    # Defaults to false
+enabled: true                               # Required
+log_enabled: false                          # Defaults to false
+log: null                                   # Defaults to /logs/newsletter.log
+sub_page_route: null                        # Defaults to /user/data/newsletter
+unsub_page_route: null                      # Defaults to /user/data/newsletter-unsub
+email_from: null                            # Defaults to email plugin default from
+flush_email_queue_preview: true             # Defaults to true
+flush_email_queue_send: false               # Defaults to false
 ```
 
 ![Screenshot of admin config screen](https://github.com/marknokes/grav-plugin-newsletter/blob/master/screenshot.png)

@@ -1,9 +1,8 @@
 enabled: true                               # Required
 log_enabled: false                          # Defaults to false
-log: null                                   # Defaults to '/logs/newsletter.log'
-data_dir: null                              # Defaults to '/user/data'
-sub_page_route: null                        # Defaults to '/newsletter'
-unsub_page_route: null                      # Defaults to '/newsletter-unsub'
+log: null                                   # Defaults to /logs/newsletter.log
+sub_page_route: null                        # Defaults to /user/data/newsletter
+unsub_page_route: null                      # Defaults to /user/data/newsletter-unsub
 email_from: null                            # Defaults to email plugin default from
 flush_email_queue_preview: true             # Defaults to true
 flush_email_queue_send: false               # Defaults to false
