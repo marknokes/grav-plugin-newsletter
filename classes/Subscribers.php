@@ -7,11 +7,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class Subscribers
 {
-	public $log 			 = '';
-
 	public $paths_exist   	 = true;
 
-	public $log_enabled  	 = false;
+	protected $log_enabled   = false;
+
+	protected $log 			 = '';
 
 	protected $data_paths	 = [
 		's_path' 	=> '',
@@ -35,9 +35,11 @@ class Subscribers
 
 			return false;
 
-		foreach ($args as $key => $value)
+		foreach ( $args as $key => $value )
 
 			$this->$key = $value;
+
+		array_push( $this->data_paths, dirname( $this->log ) );
 
 		$this->paths_exist = $this->checkPaths();
 	}
@@ -80,11 +82,7 @@ class Subscribers
      */
 	protected function checkPaths()
 	{
-		$to_check = [
-			dirname( $this->log ),
-		];
-
-		foreach ( array_merge( $to_check, $this->data_paths ) as $path )
+		foreach ( $this->data_paths as $path )
 		{
 			if( !file_exists( $path ) )
 			{
@@ -114,13 +112,13 @@ class Subscribers
      */
 	protected function setUnsubscribers()
 	{
-		$unsubscribers = [];
+		if ( !$this->paths_exist )
+
+			return false;
 
 		$dont_email = [];
 
-		if ( !$this->paths_exist )
-
-			return $unsubscribers;
+		$unsubscribers = [];
 
 		foreach ( scandir( $this->data_paths['u_path'] ) as $file )
 		{
@@ -132,6 +130,7 @@ class Subscribers
 
 			$unsubscribers[] = $user;
 		}
+
 		$this->dont_email = $dont_email;
 
 		$this->unsubscribers = $unsubscribers;
@@ -142,11 +141,11 @@ class Subscribers
      */
 	protected function setSubscribers()
 	{
-		$subscribers = [];
-
 		if ( !$this->paths_exist )
 
-			return $subscribers;
+			return false;
+
+		$subscribers = [];
 
 		foreach ( scandir( $this->data_paths['s_path'] ) as $file )
 		{
