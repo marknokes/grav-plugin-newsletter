@@ -86,6 +86,12 @@ class NewsletterPlugin extends Plugin
 
             $this->email_body     = Utils::processMarkdown( $_POST['email_body'] );
 
+            $this->queue_enabled  = $this->config->get('plugins.email.queue.enabled');
+
+            $this->flush_prev     = $this->config->get('plugins.newsletter.flush_email_queue_preview');
+
+            $this->flush_send     = $this->config->get('plugins.newsletter.flush_email_queue_send');
+
             $this->args = [
                 'data_dir'      => $_SERVER['DOCUMENT_ROOT'] . $this->data_dir,
                 'log'           => $_SERVER['DOCUMENT_ROOT'] . $this->log,
@@ -228,8 +234,9 @@ class NewsletterPlugin extends Plugin
 
                 	$errors += 1;
 
-                /* STAGING ONLY FOR LIST SEND (we want it on admin only send) */
-                /* $this->grav['Email']::flushQueue(); */
+                if ( $this->queue_enabled && $this->flush_send )
+                
+                    $this->grav['Email']::flushQueue();
 
                 $return = $errors ? $this->ajax_error : $this->ajax_success;
 
@@ -239,7 +246,7 @@ class NewsletterPlugin extends Plugin
 
                 $sent = $this->sendAdminEmail();
 
-                if ( $this->config->get('plugins.email.queue.enabled') )
+                if ( $this->queue_enabled && $this->flush_prev )
 
                     $this->grav['Email']::flushQueue();
 
