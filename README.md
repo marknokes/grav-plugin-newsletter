@@ -1,6 +1,6 @@
 # Newsletter Plugin
 
-The **Newsletter** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). Send email newsletters to a list of opt-in subscribers. Automatically process unsubscribers before adding to email queue, or sending right away if your not using the queue. The greeting is personalized for every user!
+The **Newsletter** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). Send email newsletters to a list of opt-in subscribers. Automatically process unsubscribers before adding to email queue, or sending right away if you're not using the queue. The greeting is personalized for every user!
 
 ## Installation
 
@@ -69,5 +69,5 @@ To create the admin plugin page, I looked high and low, but ultimately used the 
 
 ## To Do
 
-- [ ] Figure out how to process Twig on PHP plugin side allowing pre-defined variables to be replaced before emails are sent.
+- [ ] Figure out how to process Twig on PHP plugin side allowing predefined variables to be replaced before emails are sent.
 
