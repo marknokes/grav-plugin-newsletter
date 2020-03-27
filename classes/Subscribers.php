@@ -9,7 +9,9 @@ class Subscribers
 {
 	public $log 			 = '';
 
-	protected $data_dir 	 = '';
+	public $paths_exist   	 = true;
+
+	public $log_enabled  	 = false;
 
 	protected $data_paths	 = [
 		's_path' 	=> '',
@@ -37,9 +39,7 @@ class Subscribers
 
 			$this->$key = $value;
 
-		if( false === $this->pathsExist() )
-
-			return false;
+		$this->paths_exist = $this->checkPaths();
 	}
 
 	/**
@@ -66,28 +66,33 @@ class Subscribers
 	}
 
 	/**
+     * Log messages if logging is enabled
+     */
+	public function log( $msg )
+	{
+		if( $this->log_enabled )
+
+			return file_put_contents( $this->log, $msg, FILE_APPEND );
+	}
+
+	/**
      * Check that provided necessary paths exist.
      */
-	protected function pathsExist()
+	protected function checkPaths()
 	{
-		$return = true;
-
 		$to_check = [
-			$this->log,
-			$this->data_dir
+			dirname( $this->log ),
 		];
 
 		foreach ( array_merge( $to_check, $this->data_paths ) as $path )
 		{
 			if( !file_exists( $path ) )
 			{
-				$return = false;
-
-				break;
+				return false;
 			}
 		}
 
-		return $return;
+		return true;
 	}
 
 	/**
@@ -113,6 +118,10 @@ class Subscribers
 
 		$dont_email = [];
 
+		if ( !$this->paths_exist )
+
+			return $unsubscribers;
+
 		foreach ( scandir( $this->data_paths['u_path'] ) as $file )
 		{
 			if( '..' == $file || '.' == $file ) continue;
@@ -134,6 +143,10 @@ class Subscribers
 	protected function setSubscribers()
 	{
 		$subscribers = [];
+
+		if ( !$this->paths_exist )
+
+			return $subscribers;
 
 		foreach ( scandir( $this->data_paths['s_path'] ) as $file )
 		{
@@ -164,17 +177,13 @@ class Subscribers
 
 						$msg = "ERROR: [%s] Failed to remove [%s] [%s] from list [%s]\n";
 
-					file_put_contents(
-						$this->log,
-						sprintf(
-							$msg,
-							time(),
-							$this->subscribers[ $key ]['name'],
-							$this->subscribers[ $key ]['email'],
-							$this->subscribers[ $key ]['file_path']
-						),
-						FILE_APPEND
-					);
+					$this->log( sprintf(
+						$msg,
+						time(),
+						$this->subscribers[ $key ]['name'],
+						$this->subscribers[ $key ]['email'],
+						$this->subscribers[ $key ]['file_path']
+					) );
 
 					unset( $this->subscribers[ $key ] );
 				}
@@ -193,28 +202,20 @@ class Subscribers
 					
 					$msg = "ERROR: [%s] Failed to remove [%s] from list [%s]\n";
 
-				file_put_contents(
-					$this->log,
-					sprintf(
-						$msg,
-						time(),
-						$this->unsubscribers[ $key ]['email'],
-						$this->unsubscribers[ $key ]['file_path']
-					),
-					FILE_APPEND
-				);
+				$this->log( sprintf(
+					$msg,
+					time(),
+					$this->unsubscribers[ $key ]['email'],
+					$this->unsubscribers[ $key ]['file_path']
+				) );
 			}
 		}
 		else
 		{
-			file_put_contents(
-				$this->log,
-				sprintf(
-					"INFO: [%s] There are no users to unsubscribe.\n",
-					time()
-				),
-				FILE_APPEND
-			);
+			$this->log( sprintf(
+				"INFO: [%s] There are no users to unsubscribe.\n",
+				time()
+			) );
 		}
 	}
 }

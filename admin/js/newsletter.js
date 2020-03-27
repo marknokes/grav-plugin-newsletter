@@ -10,10 +10,14 @@ $(document).ready(function() {
         url: ajaxURL,
         data:{[ajaxName]: '_plugin_newsletter_' + onload},
         success: function (response) {
-            if(response.count || response.count === 0) {
+            var count = "error retrieving count";
+            if(response.class_subscribers_not_initialized) {
+                var str = "newsletter";
+                var res = window.location.href.replace("newsletter", "plugins/newsletter");
+                $(".subscriber-main-panel").children().hide();
+                $(".subscriber-main-panel").html('<div class="alert warning">Please check your <a href= "'+ res +'">plugin configuration settings</a>. The paths to your form pages may be incorrect.</div>');
+            } else if(response.count || response.count === 0) {
                 count = response.count;
-            } else {
-                count = 'error retrieving count';
             }
             $("span#subscriber-count").text(count);
         },

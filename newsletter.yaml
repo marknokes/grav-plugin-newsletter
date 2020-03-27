@@ -1,4 +1,5 @@
-enabled: true
+enabled: true                               # Required
+log_enabled: false                          # Defaults to false
 log: null                                   # Defaults to '/logs/newsletter.log'
 data_dir: null                              # Defaults to '/user/data'
 sub_page_route: null                        # Defaults to '/newsletter'

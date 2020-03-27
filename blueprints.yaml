@@ -28,6 +28,16 @@ form:
         0: PLUGIN_ADMIN.DISABLED
       validate:
         type: bool
+    log_enabled:
+      type: toggle
+      label: Log Enabled
+      highlight: 1
+      default: 0
+      options:
+        1: Yes
+        0: No
+      validate:
+        type: bool
     log:
       type: text
       label: Log

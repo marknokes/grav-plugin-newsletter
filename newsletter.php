@@ -15,17 +15,19 @@ use Grav\Plugin\NewsletterPlugin\Subscribers;
  */
 class NewsletterPlugin extends Plugin
 {
-    protected $route = 'newsletter';
+    protected $route 				= 'newsletter';
 
-    protected $args = [];
+    protected $args 				= [];
 
-    protected $ajax_error = ['error' => 'true' ];
+    protected $required_class_error = ['class_subscribers_not_initialized' => 'true'];
 
-    protected $ajax_success = ['success' => 'true' ];
+    protected $ajax_error 			= ['error' => 'true' ];
 
-    protected $cache_id = '_plugin_newsletter_subs_count';
+    protected $ajax_success 		= ['success' => 'true' ];
 
-    protected $ajax_actions = [
+    protected $cache_id 			= '_plugin_newsletter_subs_count';
+
+    protected $ajax_actions 		= [
     	'_plugin_newsletter_get_subs_count',
     	'_plugin_newsletter_update_list',
     	'_plugin_newsletter_email_subscribers',
@@ -72,14 +74,6 @@ class NewsletterPlugin extends Plugin
 
             $this->email_from     = $this->config->get('plugins.newsletter.email_from') ?: $this->config->get('plugins.email.from');
 
-            $this->log            = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
-
-            $this->data_dir       = $this->config->get('plugins.newsletter.data_dir') ?: '/user/data';
-
-            $this->s_path         = $this->config->get('plugins.newsletter.sub_page_route') ?: '/newsletter';
-
-            $this->u_path         = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/newsletter-unsub';
-
             $this->email_subject  = $_POST['email_subject'];
 
             $this->email_greeting = $_POST['email_greeting'];
@@ -92,12 +86,20 @@ class NewsletterPlugin extends Plugin
 
             $this->flush_send     = $this->config->get('plugins.newsletter.flush_email_queue_send');
 
+            $log_enabled    	  = $this->config->get('plugins.newsletter.log_enabled');
+
+            $log            	  = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
+
+            $s_path         	  = $this->config->get('plugins.newsletter.sub_page_route') ?: '/user/data/newsletter';
+
+            $u_path         	  = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/user/data/newsletter-unsub';
+
             $this->args = [
-                'data_dir'      => $_SERVER['DOCUMENT_ROOT'] . $this->data_dir,
-                'log'           => $_SERVER['DOCUMENT_ROOT'] . $this->log,
+                'log_enabled'   => $log_enabled,
+                'log'           => $_SERVER['DOCUMENT_ROOT'] . $log,
                 'data_paths'    => [
-                    's_path'    => $_SERVER['DOCUMENT_ROOT'] . $this->data_dir . $this->s_path,
-                    'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $this->data_dir . $this->u_path
+                    's_path'    => $_SERVER['DOCUMENT_ROOT'] . $s_path,
+                    'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path
                 ]
             ];
 
@@ -170,14 +172,21 @@ class NewsletterPlugin extends Plugin
 			    else
 			    {
 			    	$Subscribers = new Subscribers( $this->args );
-			    	
-			    	$data = ['count' => sizeof( $Subscribers->get() ) ];
-			        
-			        $cache->save( $this->cache_id, $data );
-			        
-			        $return = $data;
-			        
-			        $return['from_cache'] = false;
+
+			    	if( $Subscribers->paths_exist )
+			    	{
+				    	$data = ['count' => sizeof( $Subscribers->get() ) ];
+				        
+				        $cache->save( $this->cache_id, $data );
+				        
+				        $return = $data;
+				        
+				        $return['from_cache'] = false;
+			    	}
+			    	else
+			    	{
+			    		$return = $this->required_class_error;
+			    	}
 			    }
 
                 break;
@@ -185,60 +194,70 @@ class NewsletterPlugin extends Plugin
             case $this->ajax_actions[1]:
 
             	$Subscribers = new Subscribers( $this->args );
-                
-                $Subscribers->updateList();
-                
-                $cache->delete( $this->cache_id );
-                
-                $return = $this->ajax_success;
+
+			    if( $Subscribers->paths_exist )
+			    {
+	                $Subscribers->updateList();
+	                
+	                $cache->delete( $this->cache_id );
+	                
+	                $return = $this->ajax_success;
+                }
+		    	else
+		    	{
+		    		$return = $this->required_class_error;
+		    	}
 
                 break;
 
             case $this->ajax_actions[2]:
 
             	$Subscribers = new Subscribers( $this->args );
-                
-                $Subscribers->updateList();
 
-                $cache->delete( $this->cache_id );
+			    if( $Subscribers->paths_exist )
+			    {
+	                $Subscribers->updateList();
 
-                $errors = 0;
+	                $cache->delete( $this->cache_id );
 
-                foreach ( $Subscribers->get() as $user )
-                {
-                    $message = $this->grav['Email']
+	                $errors = 0;
 
-                    	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
+	                foreach ( $Subscribers->get() as $user )
+	                {
+	                    $message = $this->grav['Email']
 
-                    	->setFrom( $this->email_from )
+	                    	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
 
-                    	->setTo( $user['email'] );
+	                    	->setFrom( $this->email_from )
 
-                    if( !$this->grav['Email']->send( $message ) )
-                    {
-                        $errors += 1;
+	                    	->setTo( $user['email'] );
 
-                        file_put_contents(
-                            $Subscribers->log,
-                            sprintf(
+	                    if( !$this->grav['Email']->send( $message ) )
+	                    {
+	                        $errors += 1;
+
+	                        $Subscribers->log( sprintf(
                                 "ERROR: [%s] Error sending email [%s]\n",
                                 time(),
                                 $user['email']
-                            ),
-                            FILE_APPEND
-                        );
-                    }
-                }
+                            ) );
+	                    }
+	                }
 
-                if ( !$this->sendAdminEmail() )
+	                if ( !$this->sendAdminEmail() )
 
-                	$errors += 1;
+	                	$errors += 1;
 
-                if ( $this->queue_enabled && $this->flush_send )
+	                if ( $this->queue_enabled && $this->flush_send )
+	                
+	                    $this->grav['Email']::flushQueue();
                 
-                    $this->grav['Email']::flushQueue();
-
-                $return = $errors ? $this->ajax_error : $this->ajax_success;
+                	$return = $errors ? $this->ajax_error : $this->ajax_success;
+            	}
+                else
+		    	{
+		    		$return = $this->required_class_error;
+		    	}
 
                 break;
 

@@ -1,3 +1,8 @@
 .subscriber-main-panel {
 	padding: 1.5rem;
 }
+.alert.warning a {
+	color: #fff !important;
+    text-decoration: underline;
+    font-weight: bold;
+}
