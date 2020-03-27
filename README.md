@@ -1,6 +1,6 @@
 # Newsletter Plugin
 
-The **Newsletter** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). Send email newsletters to a list of opt-in subscribers. Automatically process unsubscribers before adding to email queue, or sending right away if you're not using the queue. The greeting is personalized for every user!
+The **Newsletter** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). Send email newsletters to a list of opt-in subscribers. Automatically process unsubscribers before adding to email queue, or send right away if you're not using the queue. The greeting is personalized for every user!
 
 ## Installation
 
