@@ -57,6 +57,7 @@ fields:
 
 ## To Do
 
+- [ ] Error/Exception handling.
 - [ ] Figure out how to process Twig on PHP plugin side allowing predefined variables to be replaced in subject, greeting, and body before emails are sent.
 - [ ] There should be some kind of list display/management...perhaps I'll get to that.
 - [ ] Send using templates
