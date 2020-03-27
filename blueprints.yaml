@@ -1,7 +1,7 @@
 name: Newsletter
 version: 0.1.1
 description: Send email newsletters to a list of opt-in subscribers. Automatically process unsubscribers before adding to email queue.
-icon: plug
+icon: paper-plane
 author:
   name: Mark Nokes
   email: noneya@business.com
