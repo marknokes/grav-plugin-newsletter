@@ -64,10 +64,10 @@ fields:
 
 ## Credits
 
-To create the admin plugin page, I looked high and low, but ultimately used the code found in the [Grav Comments Plugin]
-(https://github.com/getgrav/grav-plugin-comments)
+To create the admin plugin page, I looked high and low, but ultimately used the code found in the [Grav Comments Plugin](https://github.com/getgrav/grav-plugin-comments)
 
 ## To Do
 
-- [ ] Figure out how to process Twig on PHP plugin side allowing predefined variables to be replaced before emails are sent.
+- [ ] Figure out how to process Twig on PHP plugin side allowing predefined variables to be replaced in subject, greeting, and body before emails are sent.
+- [ ] There should be some kind of list display/management...perhaps I'll get to that.
 
