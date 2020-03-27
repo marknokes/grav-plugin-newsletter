@@ -64,7 +64,8 @@ fields:
 
 ## Credits
 
-To create the admin plugin page, I looked high and low, but ultimately used the code found in the [Grav Comments Plugin](https://github.com/getgrav/grav-plugin-comments)
+* To create the admin plugin page, I looked high and low, but ultimately used the code found in the [Grav Comments Plugin](https://github.com/getgrav/grav-plugin-comments)
+* I also would have spent far more time on it without the help of [Grav Dev Tools](https://github.com/getgrav/grav-plugin-devtools), upon which I stumbled while searching for tips and tricks.
 
 ## To Do
 
