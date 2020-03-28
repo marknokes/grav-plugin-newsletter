@@ -10,7 +10,8 @@ $(document).ready(function() {
         url: ajaxURL,
         data:{[ajaxName]: '_plugin_newsletter_' + onload},
         success: function (response) {
-            var count = "error retrieving count";
+            var count = "Error",
+                badge = $("#admin-menu li.selected").find(".badge.count");
             if(response.class_subscribers_not_initialized) {
                 var str = "newsletter";
                 var res = window.location.href.replace("newsletter", "plugins/newsletter");
@@ -20,6 +21,9 @@ $(document).ready(function() {
                 count = response.count;
             }
             $("span#subscriber-count").text(count);
+            if("" === $(badge).text()) {
+                $(badge).text(count);
+            }
         },
         error: function(response) {
             console.log('error', response);

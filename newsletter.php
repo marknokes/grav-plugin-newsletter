@@ -7,6 +7,8 @@ use Grav\Common\Plugin;
 
 use Grav\Common\Utils;
 
+use Grav\Common\Cache;
+
 use Grav\Plugin\NewsletterPlugin\Subscribers;
 
 /**
@@ -40,8 +42,8 @@ class NewsletterPlugin extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'onPluginsInitialized'  => ['onPluginsInitialized', 0],
             'onPagesInitialized'    => ['onPagesInitialized', 0],
+            'onPluginsInitialized'  => ['onPluginsInitialized', 0],
         ];
     }
 
@@ -56,8 +58,8 @@ class NewsletterPlugin extends Plugin
             return;
         
         $this->enable([
-            'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
-            'onAdminMenu'         => ['onAdminMenu', 0]
+            'onAdminMenu'         => ['onAdminMenu', 0],
+            'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0]
         ]);
     }
 
@@ -122,7 +124,16 @@ class NewsletterPlugin extends Plugin
      */
     public function onAdminMenu()
     {
-        $this->grav['twig']->plugins_hooked_nav['PLUGIN_NEWSLETTER.NEWSLETTER'] = ['route' => $this->route, 'icon' => 'fa-envelope-open'];
+        $cache = new Cache($this->grav);
+        $data = $cache->fetch( $this->cache_id );
+        $menu_item = [
+            'route' => $this->route,
+            'icon' => 'fa-envelope-open',
+            'badge' => [
+                'count' => $data ? $data['count']: ""
+            ]
+        ];
+        $this->grav['twig']->plugins_hooked_nav['PLUGIN_NEWSLETTER.NEWSLETTER'] = $menu_item;
     }
 
     /**
