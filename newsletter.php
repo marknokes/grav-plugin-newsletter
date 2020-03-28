@@ -43,7 +43,7 @@ class NewsletterPlugin extends Plugin
     {
         return [
             'onPagesInitialized'    => ['onPagesInitialized', 0],
-            'onPluginsInitialized'  => ['onPluginsInitialized', 0],
+            'onPluginsInitialized'  => ['onPluginsInitialized', 0]
         ];
     }
 
@@ -124,15 +124,18 @@ class NewsletterPlugin extends Plugin
      */
     public function onAdminMenu()
     {
-        $cache = new Cache($this->grav);
-        $data = $cache->fetch( $this->cache_id );
+        $cache 	   = new Cache($this->grav);
+
+        $data 	   = $cache->fetch( $this->cache_id );
+
         $menu_item = [
             'route' => $this->route,
-            'icon' => 'fa-envelope-open',
+            'icon' 	=> 'fa-envelope-open',
             'badge' => [
                 'count' => $data ? $data['count']: ""
             ]
         ];
+        
         $this->grav['twig']->plugins_hooked_nav['PLUGIN_NEWSLETTER.NEWSLETTER'] = $menu_item;
     }
 
