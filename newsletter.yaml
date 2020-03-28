@@ -4,5 +4,6 @@ log: null                                   # Defaults to /logs/newsletter.log
 sub_page_route: null                        # Defaults to /user/data/newsletter
 unsub_page_route: null                      # Defaults to /user/data/newsletter-unsub
 email_from: null                            # Defaults to email plugin default from
+email_from_name: null                       # Defaults to email plugin default from name
 flush_email_queue_preview: true             # Defaults to true
 flush_email_queue_send: false               # Defaults to false

@@ -70,29 +70,31 @@ class NewsletterPlugin extends Plugin
     {
         if( isset( $_POST['ajax_action'] ) && in_array( $_POST['ajax_action'] , $this->ajax_actions ) )
         {
-        	$this->admin_name     = $this->config->get('plugins.email.to_name') ?: 'Admin';
+        	$this->admin_name      = $this->config->get('plugins.email.to_name') ?: 'Admin';
 
-            $this->email_from     = $this->config->get('plugins.newsletter.email_from') ?: $this->config->get('plugins.email.from');
+            $this->email_from      = $this->config->get('plugins.newsletter.email_from') ?: $this->config->get('plugins.email.from');
 
-            $this->email_subject  = $_POST['email_subject'];
+            $this->email_from_name = $this->config->get('plugins.newsletter.email_from_name') ?: $this->config->get('plugins.email.from_name');
 
-            $this->email_greeting = $_POST['email_greeting'];
+            $this->email_subject   = $_POST['email_subject'];
 
-            $this->email_body     = Utils::processMarkdown( $_POST['email_body'] );
+            $this->email_greeting  = $_POST['email_greeting'];
 
-            $this->queue_enabled  = $this->config->get('plugins.email.queue.enabled');
+            $this->email_body      = Utils::processMarkdown( $_POST['email_body'] );
 
-            $this->flush_prev     = $this->config->get('plugins.newsletter.flush_email_queue_preview');
+            $this->queue_enabled   = $this->config->get('plugins.email.queue.enabled');
 
-            $this->flush_send     = $this->config->get('plugins.newsletter.flush_email_queue_send');
+            $this->flush_prev      = $this->config->get('plugins.newsletter.flush_email_queue_preview');
 
-            $log_enabled    	  = $this->config->get('plugins.newsletter.log_enabled');
+            $this->flush_send      = $this->config->get('plugins.newsletter.flush_email_queue_send');
 
-            $log            	  = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
+            $log_enabled    	   = $this->config->get('plugins.newsletter.log_enabled');
 
-            $s_path         	  = $this->config->get('plugins.newsletter.sub_page_route') ?: '/user/data/newsletter';
+            $log            	   = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
 
-            $u_path         	  = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/user/data/newsletter-unsub';
+            $s_path         	   = $this->config->get('plugins.newsletter.sub_page_route') ?: '/user/data/newsletter';
+
+            $u_path         	   = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/user/data/newsletter-unsub';
 
             $this->args = [
                 'log_enabled'   => $log_enabled,
@@ -141,7 +143,7 @@ class NewsletterPlugin extends Plugin
 
         	->message( $this->email_subject, $this->getEmailBody( $this->admin_name ), 'text/html' )
             
-            ->setFrom( $this->email_from )
+            ->setFrom( [ $this->email_from => $this->email_from_name ] )
             
             ->setTo( $this->email_from );
 
@@ -228,9 +230,9 @@ class NewsletterPlugin extends Plugin
 
 	                    	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
 
-	                    	->setFrom( $this->email_from )
+	                    	->setFrom( [ $this->email_from => $this->email_from_name ] )
 
-	                    	->setTo( $user['email'] );
+	                    	->setTo( [ $user['email'] => $user['name'] ] );
 
 	                    if( !$this->grav['Email']->send( $message ) )
 	                    {

@@ -58,6 +58,11 @@ form:
       label: Email from
       help: Optional. See default value in placeholder or newsletter.yaml
       placeholder: Defaults to email plugin default from
+    email_from_name:
+      type: text
+      label: Email from name
+      help: Optional. See default value in placeholder or newsletter.yaml
+      placeholder: Defaults to email plugin default from name
     flush_email_queue_preview:
       type: toggle
       label: Flush email queue on admin preview
