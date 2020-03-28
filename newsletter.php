@@ -145,7 +145,7 @@ class NewsletterPlugin extends Plugin
             
             ->setFrom( [ $this->email_from => $this->email_from_name ] )
             
-            ->setTo( $this->email_from );
+            ->setTo( [ $this->email_from => $this->email_from_name ] );
 
         return $this->grav['Email']->send( $message );
     }
