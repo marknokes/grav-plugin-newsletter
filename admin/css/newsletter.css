@@ -6,3 +6,19 @@
     text-decoration: underline;
     font-weight: bold;
 }
+#newsletter-submit-overlay {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,.5);
+    display: none;
+}
+div#newsletter-submit-overlay p {
+    text-align: center;
+    color: #fff;
+    font-size: 2rem;
+    top: 40px;
+    position: relative;
+}

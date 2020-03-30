@@ -3,7 +3,8 @@ $(document).ready(function() {
     var $loadElement =$("#admin-page-load"),
         ajaxName = $loadElement.data("ajax-name"),
         onload = $loadElement.data("onload"),
-        ajaxURL = $loadElement.data("ajax-url");
+        ajaxURL = $loadElement.data("ajax-url"),
+        overlay = $("#newsletter-submit-overlay");
     $("span#subscriber-count").text($("#admin-menu li.selected").find(".badge.count").text());
     $.ajax({
         type: 'post',
@@ -24,6 +25,7 @@ $(document).ready(function() {
     $(".submit-update").click(function(e){
         e.preventDefault();
         data = {[ajaxName]: '_plugin_newsletter_' + $(this).data("action")};
+        overlay.show();
         $.ajax({
             type: 'post',
             dataType: 'json',
@@ -37,6 +39,7 @@ $(document).ready(function() {
                 }
             },
             error: function(response) {
+            	overlay.hide();
                 console.log(response);
             }
         });
@@ -61,6 +64,7 @@ $(document).ready(function() {
             'email_subject' :email_subject,
             'email_greeting' :email_greeting
         };
+        overlay.show();
         $.ajax({
             type: 'post',
             dataType: 'json',
@@ -75,6 +79,7 @@ $(document).ready(function() {
                 }
             },
             error: function(response) {
+            	overlay.hide();
                 console.log('error', response);
             }
         });
