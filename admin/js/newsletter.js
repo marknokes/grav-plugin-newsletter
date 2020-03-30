@@ -49,20 +49,18 @@ $(document).ready(function() {
         var conf = confirm("The list will be auto updated before send. Sure you're ready?"),
             $form = $("#email-subscribers"),
             email_body = $("textarea#body").val(),
-            email_subject = $("input#email_subject").val(),
-            email_greeting = $("input#email_greeting").val();
+            email_subject = $("input#email_subject").val();
         if (!conf) {
           return;
         }
-        if(!email_body || !email_subject || !email_greeting) {
+        if(!email_body || !email_subject) {
             alert("Please complete all fields.");
             return;
         }
         data = {
             [ajaxName]       : '_plugin_newsletter_' + $(this).data("action"),
             'email_body'    :email_body,
-            'email_subject' :email_subject,
-            'email_greeting' :email_greeting
+            'email_subject' :email_subject
         };
         overlay.show();
         $.ajax({

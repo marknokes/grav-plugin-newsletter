@@ -119,8 +119,6 @@ class NewsletterPlugin extends Plugin
 
         $this->email_subject   = $_POST['email_subject'];
 
-        $this->email_greeting  = $_POST['email_greeting'];
-
         $this->email_body      = Utils::processMarkdown( $_POST['email_body'] );
 
         $this->queue_enabled   = $this->config->get('plugins.email.queue.enabled');
@@ -145,34 +143,6 @@ class NewsletterPlugin extends Plugin
                 'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path
             ]
         ];
-    }
-
-    /**
-	* Format the email body to include the user's name. This should probably be done with some kind of Twig class
-	* but I got impatient while browsing the API documentation and couldn't find a Twig solution faster than I could
-	* write this one-liner.
-	*/
-    protected function getEmailBody( $name )
-    {
-    	$greeting = preg_replace( '/(\{\{\sname\s\}\})/', $name, $this->email_greeting );
-
-    	return "<p>$greeting</p>$this->email_body";
-    }
-
-    /**
-     * Send an email preview to admin
-     */
-    protected function sendAdminEmail()
-    {
-    	$message = $this->grav['Email']
-
-        	->message( $this->email_subject, $this->getEmailBody( $this->admin_name ), 'text/html' )
-            
-            ->setFrom( [ $this->email_from => $this->email_from_name ] )
-            
-            ->setTo( [ $this->email_from => $this->email_from_name ] );
-
-        return $this->grav['Email']->send( $message );
     }
 
     /**
@@ -232,6 +202,34 @@ class NewsletterPlugin extends Plugin
     }
 
     /**
+    * Format twig string. Add user's name to twig vars.
+    */
+    protected function processTwigVars( $content, $name )
+    {
+        $twig = new \Twig_Environment( new \Twig_Loader_String() );
+
+        $vars = array_merge( $this->grav['twig']->twig_vars, array( 'subscriber' => $name ) );
+
+        return $twig->render( $content, $vars );
+    }
+
+    /**
+     * Send an email preview to admin
+     */
+    protected function sendAdminEmail()
+    {
+        $message = $this->grav['Email']
+
+            ->message( $this->processTwigVars( $this->email_subject, $this->admin_name ), $this->processTwigVars( $this->email_body, $this->admin_name ), 'text/html' )
+            
+            ->setFrom( [ $this->email_from => $this->email_from_name ] )
+            
+            ->setTo( [ $this->email_from => $this->email_from_name ] );
+
+        return $this->grav['Email']->send( $message );
+    }
+
+    /**
      * Email the list of subscribers. Admin is included by default.
      */
     protected function emailSubscribers()
@@ -250,7 +248,7 @@ class NewsletterPlugin extends Plugin
             {
                 $message = $this->grav['Email']
 
-                	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
+                	->message( $this->processTwigVars( $this->email_subject, $user['name'] ), $this->processTwigVars( $this->email_body, $user['name'] ), 'text/html' )
 
                 	->setFrom( [ $this->email_from => $this->email_from_name ] )
 

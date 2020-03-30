@@ -14,11 +14,9 @@
             <p>{{ "PLUGIN_NEWSLETTER.MESSAGE_HELP"|tu }}</p>
             <form id="email-subscribers" method="POST" autocomplete="off">
                 <label for="email_subject">{{ "PLUGIN_NEWSLETTER.EMAIL_SUBJECT_LABEL"|tu }}</label>
-                <input id="email_subject" type="text" name="email_subject" autocomplete="off" />
-                <label for="email_greeting">{{ "PLUGIN_NEWSLETTER.EMAIL_GREETING_LABEL"|tu }}</label>
-                <input id="email_greeting" type="text" name="email_greeting" value="{{ "PLUGIN_NEWSLETTER.DEFAULT_GREETING"|tu }}" autocomplete="off" />
+                <input id="email_subject" type="text" name="email_subject" autocomplete="off" value="{{ "PLUGIN_NEWSLETTER.DEFAULT_SUBJECT"|tu }}"/>
                 <label for="body">{{ "PLUGIN_NEWSLETTER.EMAIL_BODY_LABEL"|tu }}</label>
-                <textarea rows="15" id="body" autocomplete="off"></textarea>
+                <textarea rows="15" id="body" autocomplete="off">{{ "PLUGIN_NEWSLETTER.BODY_TEMPLATE"|tu }}</textarea>
             </form>
             <a class="button submit-email" data-action="email_subscribers" href="#"><i class="fa fa-fw fa-paper-plane-o"></i>{{ "PLUGIN_NEWSLETTER.SEND_BTN_TXT"|tu }}</a>
             <a class="button submit-email" data-action="email_admin" href="#"><i class="fa fa-fw fa-paper-plane"></i>{{ "PLUGIN_NEWSLETTER.SEND_BTN_ADM_TXT"|tu }}</a>
