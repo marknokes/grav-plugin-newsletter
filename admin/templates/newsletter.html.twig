@@ -1,7 +1,4 @@
 {% extends 'partials/base.html.twig' %}
-{% if admin.route %}
-    {% set context = admin.page(true) %}
-{% endif %}
 {% block titlebar %}
     <h1><i class="fa fa-fw fa-envelope-open"></i> {{ "PLUGIN_NEWSLETTER.NEWSLETTER"|tu }}</h1>
 {% endblock %}

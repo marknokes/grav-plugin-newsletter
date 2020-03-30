@@ -4,25 +4,17 @@ $(document).ready(function() {
         ajaxName = $loadElement.data("ajax-name"),
         onload = $loadElement.data("onload"),
         ajaxURL = $loadElement.data("ajax-url");
+    $("span#subscriber-count").text($("#admin-menu li.selected").find(".badge.count").text());
     $.ajax({
         type: 'post',
         dataType: 'json',
         url: ajaxURL,
         data:{[ajaxName]: '_plugin_newsletter_' + onload},
         success: function (response) {
-            var count = "Error",
-                badge = $("#admin-menu li.selected").find(".badge.count");
             if(response.class_subscribers_not_initialized) {
-                var str = "newsletter";
                 var res = window.location.href.replace("newsletter", "plugins/newsletter");
                 $(".subscriber-main-panel").children().hide();
                 $(".subscriber-main-panel").html('<div class="alert warning">Please check your <a href= "'+ res +'">plugin configuration settings</a>. The paths to your form pages may be incorrect.</div>');
-            } else if(response.count || response.count === 0) {
-                count = response.count;
-            }
-            $("span#subscriber-count").text(count);
-            if("" === $(badge).text()) {
-                $(badge).text(count);
             }
         },
         error: function(response) {

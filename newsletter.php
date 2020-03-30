@@ -9,6 +9,8 @@ use Grav\Common\Cache;
 
 use Grav\Plugin\NewsletterPlugin\Subscribers;
 
+require_once __DIR__ . '/classes/Subscribers.php';
+
 /**
  * Class NewsletterPlugin
  * @package Grav\Plugin
@@ -70,40 +72,7 @@ class NewsletterPlugin extends Plugin
     {
         if( isset( $_POST['ajax_action'] ) && in_array( $_POST['ajax_action'] , $this->ajax_actions ) )
         {
-        	$this->admin_name      = $this->config->get('plugins.email.to_name') ?: 'Admin';
-
-            $this->email_from      = $this->config->get('plugins.newsletter.email_from') ?: $this->config->get('plugins.email.from');
-
-            $this->email_from_name = $this->config->get('plugins.newsletter.email_from_name') ?: $this->config->get('plugins.email.from_name');
-
-            $this->email_subject   = $_POST['email_subject'];
-
-            $this->email_greeting  = $_POST['email_greeting'];
-
-            $this->email_body      = Utils::processMarkdown( $_POST['email_body'] );
-
-            $this->queue_enabled   = $this->config->get('plugins.email.queue.enabled');
-
-            $this->flush_prev      = $this->config->get('plugins.newsletter.flush_email_queue_preview');
-
-            $this->flush_send      = $this->config->get('plugins.newsletter.flush_email_queue_send');
-
-            $log_enabled    	   = $this->config->get('plugins.newsletter.log_enabled');
-
-            $log            	   = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
-
-            $s_path         	   = $this->config->get('plugins.newsletter.sub_page_route') ?: '/user/data/newsletter';
-
-            $u_path         	   = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/user/data/newsletter-unsub';
-
-            $this->args = [
-                'log_enabled'   => $log_enabled,
-                'log'           => $_SERVER['DOCUMENT_ROOT'] . $log,
-                'data_paths'    => [
-                    's_path'    => $_SERVER['DOCUMENT_ROOT'] . $s_path,
-                    'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path
-                ]
-            ];
+        	$this->initArgs();
 
             die( json_encode( $this->processAjaxAction() ) );
         }
@@ -122,19 +91,60 @@ class NewsletterPlugin extends Plugin
      */
     public function onAdminMenu()
     {
-        $cache 	   = new Cache($this->grav);
+        $this->initArgs();
 
-        $data 	   = $cache->fetch( $this->cache_id );
+        $data = $this->getSubscriberCount();
 
         $menu_item = [
             'route' => $this->route,
             'icon' 	=> 'fa-envelope-open',
             'badge' => [
-                'count' => $data ? $data['count']: ""
+                'count' => $data['count'] ?: 0
             ]
         ];
         
         $this->grav['twig']->plugins_hooked_nav['PLUGIN_NEWSLETTER.NEWSLETTER'] = $menu_item;
+    }
+
+    /**
+     * Initialize class arguments
+     */
+    protected function initArgs()
+    {
+    	$this->admin_name      = $this->config->get('plugins.email.to_name') ?: 'Admin';
+
+        $this->email_from      = $this->config->get('plugins.newsletter.email_from') ?: $this->config->get('plugins.email.from');
+
+        $this->email_from_name = $this->config->get('plugins.newsletter.email_from_name') ?: $this->config->get('plugins.email.from_name');
+
+        $this->email_subject   = $_POST['email_subject'];
+
+        $this->email_greeting  = $_POST['email_greeting'];
+
+        $this->email_body      = Utils::processMarkdown( $_POST['email_body'] );
+
+        $this->queue_enabled   = $this->config->get('plugins.email.queue.enabled');
+
+        $this->flush_prev      = $this->config->get('plugins.newsletter.flush_email_queue_preview');
+
+        $this->flush_send      = $this->config->get('plugins.newsletter.flush_email_queue_send');
+
+        $log_enabled    	   = $this->config->get('plugins.newsletter.log_enabled');
+
+        $log            	   = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
+
+        $s_path         	   = $this->config->get('plugins.newsletter.sub_page_route') ?: '/user/data/newsletter';
+
+        $u_path         	   = $this->config->get('plugins.newsletter.unsub_page_route') ?: '/user/data/newsletter-unsub';
+
+        $this->args = [
+            'log_enabled'   => $log_enabled,
+            'log'           => $_SERVER['DOCUMENT_ROOT'] . $log,
+            'data_paths'    => [
+                's_path'    => $_SERVER['DOCUMENT_ROOT'] . $s_path,
+                'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path
+            ]
+        ];
     }
 
     /**
@@ -149,6 +159,9 @@ class NewsletterPlugin extends Plugin
     	return "<p>$greeting</p>$this->email_body";
     }
 
+    /**
+     * Send an email preview to admin
+     */
     protected function sendAdminEmail()
     {
     	$message = $this->grav['Email']
@@ -162,116 +175,139 @@ class NewsletterPlugin extends Plugin
         return $this->grav['Email']->send( $message );
     }
 
+    /**
+     * Get the current count of subscribers from cache, if exists,
+     * or retrive fresh count.
+     */
+    protected function getSubscriberCount()
+    {
+    	if ( $data = $this->grav['cache']->fetch( $this->cache_id ) )
+	    {
+	        $return = $data;
+
+	        $return['from_cache'] = true;
+	    }
+	    else
+	    {
+	    	$Subscribers = new Subscribers( $this->args );
+
+	    	if( $Subscribers->paths_exist )
+	    	{
+		    	$data = ['count' => sizeof( $Subscribers->get() ) ];
+		        
+		        $this->grav['cache']->save( $this->cache_id, $data );
+		        
+		        $return = $data;
+		        
+		        $return['from_cache'] = false;
+	    	}
+	    	else
+	    	{
+	    		$return = $this->required_class_error;
+	    	}
+	    }
+
+	    return $return;
+    }
+
+	/**
+     * Clear the cache and update the list of subscribers
+     */
+    protected function updateList()
+    {
+    	$Subscribers = new Subscribers( $this->args );
+
+	    if( $Subscribers->paths_exist )
+	    {
+            $Subscribers->updateList();
+            
+            $this->grav['cache']->delete( $this->cache_id );
+            
+            return $this->ajax_success;
+        }
+    	else
+    	{
+    		return $this->required_class_error;
+    	}
+    }
+
+    /**
+     * Email the list of subscribers. Admin is included by default.
+     */
+    protected function emailSubscribers()
+    {
+        $Subscribers = new Subscribers( $this->args );
+
+	    if( $Subscribers->paths_exist )
+	    {
+            $Subscribers->updateList();
+
+            $this->grav['cache']->delete( $this->cache_id );
+
+            $errors = 0;
+
+            foreach ( $Subscribers->get() as $user )
+            {
+                $message = $this->grav['Email']
+
+                	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
+
+                	->setFrom( [ $this->email_from => $this->email_from_name ] )
+
+                	->setTo( [ $user['email'] => $user['name'] ] );
+
+                if( !$this->grav['Email']->send( $message ) )
+                {
+                    $errors += 1;
+
+                    $Subscribers->log( sprintf(
+                        "ERROR: [%s] Error sending email [%s]\n",
+                        time(),
+                        $user['email']
+                    ) );
+                }
+            }
+
+            if ( !$this->sendAdminEmail() )
+
+            	$errors += 1;
+
+            if ( $this->queue_enabled && $this->flush_send )
+            
+                $this->grav['Email']::flushQueue();
+        
+        	return $errors ? $this->ajax_error : $this->ajax_success;
+    	}
+        else
+    	{
+    		return $this->required_class_error;
+    	}
+    }
+
 	/**
      * Take action based on provided ajax action.
      */
-    public function processAjaxAction()
+    protected function processAjaxAction()
     {
-        include __DIR__ . '/classes/Subscribers.php';
-
         $return = [];
-
-        $cache = $this->grav['cache'];
 
         switch ( $_POST['ajax_action'] )
         {
             case $this->ajax_actions[0]:
 
-			    if ( $data = $cache->fetch( $this->cache_id ) )
-			    {
-			        $return = $data;
-
-			        $return['from_cache'] = true;
-			    }
-			    else
-			    {
-			    	$Subscribers = new Subscribers( $this->args );
-
-			    	if( $Subscribers->paths_exist )
-			    	{
-				    	$data = ['count' => sizeof( $Subscribers->get() ) ];
-				        
-				        $cache->save( $this->cache_id, $data );
-				        
-				        $return = $data;
-				        
-				        $return['from_cache'] = false;
-			    	}
-			    	else
-			    	{
-			    		$return = $this->required_class_error;
-			    	}
-			    }
+			    $return = $this->getSubscriberCount();
 
                 break;
 
             case $this->ajax_actions[1]:
 
-            	$Subscribers = new Subscribers( $this->args );
-
-			    if( $Subscribers->paths_exist )
-			    {
-	                $Subscribers->updateList();
-	                
-	                $cache->delete( $this->cache_id );
-	                
-	                $return = $this->ajax_success;
-                }
-		    	else
-		    	{
-		    		$return = $this->required_class_error;
-		    	}
+            	$return = $this->updateList();
 
                 break;
 
             case $this->ajax_actions[2]:
 
-            	$Subscribers = new Subscribers( $this->args );
-
-			    if( $Subscribers->paths_exist )
-			    {
-	                $Subscribers->updateList();
-
-	                $cache->delete( $this->cache_id );
-
-	                $errors = 0;
-
-	                foreach ( $Subscribers->get() as $user )
-	                {
-	                    $message = $this->grav['Email']
-
-	                    	->message( $this->email_subject, $this->getEmailBody( $user['name'] ), 'text/html' )
-
-	                    	->setFrom( [ $this->email_from => $this->email_from_name ] )
-
-	                    	->setTo( [ $user['email'] => $user['name'] ] );
-
-	                    if( !$this->grav['Email']->send( $message ) )
-	                    {
-	                        $errors += 1;
-
-	                        $Subscribers->log( sprintf(
-                                "ERROR: [%s] Error sending email [%s]\n",
-                                time(),
-                                $user['email']
-                            ) );
-	                    }
-	                }
-
-	                if ( !$this->sendAdminEmail() )
-
-	                	$errors += 1;
-
-	                if ( $this->queue_enabled && $this->flush_send )
-	                
-	                    $this->grav['Email']::flushQueue();
-                
-                	$return = $errors ? $this->ajax_error : $this->ajax_success;
-            	}
-                else
-		    	{
-		    		$return = $this->required_class_error;
-		    	}
+  				$return = $this->emailSubscribers();
 
                 break;
 
@@ -289,7 +325,7 @@ class NewsletterPlugin extends Plugin
 
             default:
 
-            	return false;
+            	return $this->ajax_error;
 
                 break;
         }
