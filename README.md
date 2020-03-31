@@ -1,3 +1,8 @@
+## Donation
+If you find this plugin useful, please consider making a donation. Thank you!
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HQFGGDAGHHM22)
+
 # Newsletter Plugin
 
 The **Newsletter** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). It allows you to send email newsletters to a list of opt-in subscribers. It will automatically process unsubscribers before adding to email queue, or send right away if you're not using the queue. The greeting is personalized for every user! The email body supports markdown.
