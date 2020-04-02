@@ -64,11 +64,12 @@ fields:
 
 * To create the admin plugin page, I looked high and low, but ultimately used the code found in the [Grav Comments Plugin](https://github.com/getgrav/grav-plugin-comments)
 * I also would have spent far more time on it without the help of [Grav Dev Tools](https://github.com/getgrav/grav-plugin-devtools), upon which I stumbled while searching for tips and tricks.
+* Big thanks to [the Man Things blog](https://manthings.net) for being a hilarious and inspiring website. Yeah, it's mine.
 
 ## To Do
 
 - [ ] Error/Exception handling.
 - [x] Figure out how to process Twig on PHP plugin side allowing predefined variables to be replaced in subject, greeting, and body before emails are sent.
 - [ ] There should be some kind of list display/management...perhaps I'll get to that.
-- [ ] Send using templates
+- [x] Send using templates Note: I only sort of got to this, but I like the way it's working. You can make one template.
 - [ ] Integration with external email sending/list management API's
