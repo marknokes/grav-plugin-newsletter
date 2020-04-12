@@ -60,8 +60,13 @@ user_registration:
 
 ```yaml
 newsletter:
-    type: checkbox
+    type: toggle
     label: 'Subscribe to newsletter'
+    default: '0'
+    highlight: 1
+    options:
+        '1': GRAV.YES
+        '0': GRAV.NO
 ```
 
 ![Screenshot of admin config screen](https://github.com/marknokes/grav-plugin-newsletter/blob/master/screenshot.png)
