@@ -39,6 +39,31 @@ flush_email_queue_preview: true             # Defaults to true
 flush_email_queue_send: false               # Defaults to false
 ```
 
+**Optional**: To allow registered members of your site to subscribe without filling out the form, add the newsletter field to
+/user/config/plugins/login.yaml. Example:
+
+```yaml
+user_registration:
+  enabled: false
+  fields:
+    - username
+    - password
+    - email
+    - newsletter
+    - fullname
+    - title
+    - level
+    - twofa_enabled
+```
+
+**Optional cont.**: Then override the user profile page and add the checkbox to the profile. Example:
+
+```yaml
+newsletter:
+    type: checkbox
+    label: 'Subscribe to newsletter'
+```
+
 ![Screenshot of admin config screen](https://github.com/marknokes/grav-plugin-newsletter/blob/master/screenshot.png)
 
 Note that if you use the Admin Plugin, a file with your configuration named newsletter.yaml will be saved in the `user/config/plugins/`-folder once the configuration is saved in the Admin.

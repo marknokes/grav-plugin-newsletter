@@ -11,6 +11,8 @@ class Subscribers
 
 	protected $log_enabled   = false;
 
+	protected $user_accts    = '';
+
 	protected $log 			 = '';
 
 	protected $data_paths	 = [
@@ -39,7 +41,9 @@ class Subscribers
 
 			$this->$key = $value;
 
-		array_push( $this->data_paths, dirname( $this->log ) );
+		$this->user_accts = $_SERVER['DOCUMENT_ROOT'] . '/user/accounts';
+		
+		array_push( $this->data_paths, dirname( $this->log ), $this->user_accts );
 
 		$this->paths_exist = $this->checkPaths();
 	}
@@ -152,6 +156,20 @@ class Subscribers
 			if( '..' == $file || '.' == $file ) continue;
 
 			$subscribers[] = $this->buildUserArray( $this->data_paths['s_path'] . "/$file"  );
+		}
+
+		foreach ( scandir( $this->user_accts ) as $file )
+		{
+			if( '..' == $file || '.' == $file ) continue;
+
+			$user = $this->buildUserArray( $this->user_accts . "/$file"  );
+
+			if( isset( $user['newsletter'] ) && $user['newsletter'] == 1 )
+			{
+				$user['name'] = $user['fullname'];
+
+				$subscribers[] = $user;
+			}
 		}
 
 		$this->subscribers = $subscribers;
