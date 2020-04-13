@@ -140,7 +140,8 @@ class NewsletterPlugin extends Plugin
             'log'           => $_SERVER['DOCUMENT_ROOT'] . $log,
             'data_paths'    => [
                 's_path'    => $_SERVER['DOCUMENT_ROOT'] . $s_path,
-                'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path
+                'u_path'    => $_SERVER['DOCUMENT_ROOT'] . $u_path,
+                'a_path'    => $_SERVER['DOCUMENT_ROOT'] . '/user/accounts'
             ]
         ];
     }

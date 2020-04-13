@@ -40,10 +40,8 @@ class Subscribers
 		foreach ( $args as $key => $value )
 
 			$this->$key = $value;
-
-		$this->user_accts = $_SERVER['DOCUMENT_ROOT'] . '/user/accounts';
 		
-		array_push( $this->data_paths, dirname( $this->log ), $this->user_accts );
+		array_push( $this->data_paths, dirname( $this->log ) );
 
 		$this->paths_exist = $this->checkPaths();
 	}
@@ -155,20 +153,39 @@ class Subscribers
 		{
 			if( '..' == $file || '.' == $file ) continue;
 
-			$subscribers[] = $this->buildUserArray( $this->data_paths['s_path'] . "/$file"  );
+			$user = $this->buildUserArray( $this->data_paths['s_path'] . "/$file"  );
+
+			if( !isset( $subscribers[ $user['email'] ] ) )
+			{
+				$subscribers[ $user['email'] ] = $user;
+			}
+			else
+			{
+				// User already subscribed. Remove duplicate subscription
+				array_push( $this->dont_email, $user['email'] );
+			}
+
 		}
 
-		foreach ( scandir( $this->user_accts ) as $file )
+		foreach ( scandir( $this->data_paths['a_path'] ) as $file )
 		{
 			if( '..' == $file || '.' == $file ) continue;
 
-			$user = $this->buildUserArray( $this->user_accts . "/$file"  );
+			$account_user = $this->buildUserArray( $this->data_paths['a_path'] . "/$file"  );
 
-			if( isset( $user['newsletter'] ) && $user['newsletter'] == 1 )
+			if( isset( $account_user['newsletter'] ) && $account_user['newsletter'] == 1 )
 			{
-				$user['name'] = $user['fullname'];
+				if( !isset( $subscribers[ $account_user['email'] ] ) )
+				{
+					$account_user['name'] = $account_user['fullname'];
 
-				$subscribers[] = $user;
+					$subscribers[ $account_user['email'] ] = $account_user;
+				}
+				else
+				{
+					// Member already subscribed via form. Remove duplicate subscription.
+					array_push( $this->dont_email, $account_user['email'] );
+				}
 			}
 		}
 
