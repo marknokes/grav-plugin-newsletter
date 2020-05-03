@@ -85,3 +85,19 @@ form:
         0: No
       validate:
         type: bool
+    add_latest_posts:
+      type: toggle
+      label: Enable [latest_posts] shortcode in email body?
+      help: Use shortcode [latest_posts] in email body.
+      highlight: 1
+      default: 0
+      options:
+        1: Yes
+        0: No
+      validate:
+        type: bool
+    json_feed_url:
+      type: text
+      label: JSON Feed URL
+      help: Set this if testing on a private network or want to change limit
+      placeholder: Defaults to scheme://yourdomain/blog.json?limit=3

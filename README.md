@@ -37,6 +37,8 @@ email_from: null                            # Defaults to email plugin default f
 email_from_name: null                       # Defaults to email plugin default from name
 flush_email_queue_preview: true             # Defaults to true
 flush_email_queue_send: false               # Defaults to false
+json_feed_url: null                         # Ex: https://domain.com/blog.json?limit=4
+add_latest_posts: true                      # Use shortcode [latest_posts] in email body
 ```
 
 **Optional**: To allow registered members of your site to subscribe without filling out the form, add the newsletter field to

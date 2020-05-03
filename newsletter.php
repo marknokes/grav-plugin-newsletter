@@ -127,6 +127,10 @@ class NewsletterPlugin extends Plugin
 
         $this->flush_send      = $this->config->get('plugins.newsletter.flush_email_queue_send');
 
+        $this->add_posts       = $this->config->get('plugins.newsletter.add_latest_posts');
+
+        $this->json_feed_url   = $this->config->get('plugins.newsletter.json_feed_url') ?: $this->grav['uri']->scheme() . $this->grav['uri']->host() . '/blog.json';
+
         $log_enabled    	   = $this->config->get('plugins.newsletter.log_enabled');
 
         $log            	   = $this->config->get('plugins.newsletter.log') ?: '/logs/newsletter.log';
@@ -202,6 +206,69 @@ class NewsletterPlugin extends Plugin
     	}
     }
 
+    protected function getRecentPostHTMLFromJSONFeed()
+    {
+        if ( $table = $this->grav['cache']->fetch( '_plugin_newsletter_latest_posts' ) )
+        {
+            return $table;
+        }
+        else
+        {
+            // Taking the long way in case the feed is on another domain or you're working on an intranet site
+            $url_parts = parse_url( $this->json_feed_url );
+            // Get the query string params
+            parse_str( $url_parts['query'], $output );
+            // Build the url for the image link
+            $url = $url_parts['scheme'] . "://" . $url_parts['host'];
+            // Get the feed data
+            $data = json_decode( file_get_contents( $this->json_feed_url ) );
+            // Use the limit from query string, e.g., blog.json?limit=10, or a default value of 3
+            $limit = $output['limit'] ?? 3;
+            // Get the total number of items available
+            $item_count = count( $data->items );
+            // If there aren't at least as many posts as the limit, set the limit to total number of items
+            $real_limit = $item_count < $limit ? $item_count: $limit;
+
+            if( $data->items )
+            {
+                $table = '<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%"><tr><td align="left" valign="top"><table border="0" cellpadding="0" cellspacing="0" width="600">';
+
+                $rows = '';
+
+                for ( $i = 0; $i <= $real_limit; $i++ )
+                { 
+                    $post = $data->items[ $i ];
+
+                    if( !isset( $post->post_image, $post->url ) )
+
+                        continue;
+
+                    $rows .= '<tr><td align="left" valign="top">';
+                    $rows .= '<a href="' . $post->url . '" style="text-decoration: none;font-family: \'Open Sans\', Arial, sans-serif;">';
+                    $rows .= '<img width="200" alt="" src="' . $url . $post->post_image . '">';
+                    $rows .= '<br />' . $post->title;
+                    $rows .= '</a><br /><br /></td></tr>';
+                }
+
+                $table .= $rows;
+
+                $table .='</table></td></tr></table>';
+
+                $this->grav['cache']->save( '_plugin_newsletter_latest_posts', $table );
+                
+                return $table;
+            }
+            else 
+
+                return '';
+        }
+    }
+
+    protected function processLatestPostsShortcode( $body )
+    {
+        return str_replace( '[latest_posts]', $this->getRecentPostHTMLFromJSONFeed(), $body );
+    }
+
     /**
     * Format twig string. Add user's name to twig vars.
     */
@@ -219,9 +286,13 @@ class NewsletterPlugin extends Plugin
      */
     protected function sendAdminEmail()
     {
+        $body = $this->processTwigVars( $this->email_body, $this->admin_name );
+
+        $body = $this->add_posts ? $this->processLatestPostsShortcode( $body ): $body;
+
         $message = $this->grav['Email']
 
-            ->message( $this->processTwigVars( $this->email_subject, $this->admin_name ), $this->processTwigVars( $this->email_body, $this->admin_name ), 'text/html' )
+            ->message( $this->processTwigVars( $this->email_subject, $this->admin_name ), $body, 'text/html' )
             
             ->setFrom( [ $this->email_from => $this->email_from_name ] )
             
@@ -247,9 +318,13 @@ class NewsletterPlugin extends Plugin
 
             foreach ( $Subscribers->get() as $user )
             {
+                $body = $this->processTwigVars( $this->email_body, $user['name'] );
+
+                $body = $this->add_posts ? $this->processLatestPostsShortcode( $body ): $body;
+
                 $message = $this->grav['Email']
 
-                	->message( $this->processTwigVars( $this->email_subject, $user['name'] ), $this->processTwigVars( $this->email_body, $user['name'] ), 'text/html' )
+                	->message( $this->processTwigVars( $this->email_subject, $user['name'] ), $body, 'text/html' )
 
                 	->setFrom( [ $this->email_from => $this->email_from_name ] )
 
